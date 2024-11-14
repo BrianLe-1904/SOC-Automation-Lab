@@ -11,6 +11,8 @@
     
     curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
     
+Extract Wazuh Credentials
+sudo tar -xvf wazuh-install-files.tar
 
 ### Login to Wazuh: [https://](https://170.64.228.68/app/login)209.38.86.8
 
