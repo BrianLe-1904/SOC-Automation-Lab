@@ -1,0 +1,31 @@
+### **Add Firewalls rules to Wazuh:**
+
+- Networking → Firewalls → add Droplet → Wazuh
+
+### Connect to Wazuh server:
+
+- open terminal → ssh root@209.38.86.8
+- yes → type root password
+- update and upgrade server: apt-get update && apt-get upgrade -y
+- install Wazuh 4.7:
+    
+    curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
+    
+
+### Login to Wazuh: [https://](https://170.64.228.68/app/login)209.38.86.8
+
+- using user and password from Login Credentials
+
+## Configure Wazuh
+
+- login to Wazuh dashboard
+    - using user and password from Login Credentials
+- unzip/extract the wazuh-install-files: tar -xvf wazuh-install-files.tar → look for wazuh-passwords.txt → this stores wazuh credentials
+
+### Create Agent
+
+- assign a server address: (IP address) 170.64.175.224
+- assign agent name: Brian
+- Copy the commands
+- Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-4.7.5-1.msi -OutFile ${env.tmp}\wazuh-agent; msiexec.exe /i ${env.tmp}\wazuh-agent /q WAZUH_MANAGER='170.64.175.224' WAZUH_AGENT_NAME='brian' WAZUH_REGISTRATION_SERVER='170.64.175.224'
+- start the service: NET START WazuhSvc
