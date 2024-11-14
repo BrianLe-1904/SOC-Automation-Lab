@@ -1,0 +1,118 @@
+### **Add Firewalls rules to TheHive:**
+
+- Networking → Firewalls → add Droplet → TheHive
+
+### Connect to TheHive server:
+
+- open terminal → ssh root@170.64.141.171
+- yes → type root password
+- update and upgrade server: apt-get update && apt-get upgrade -y
+
+### Installing TheHive 5
+
+- Dependences
+apt install wget gnupg apt-transport-https git ca-certificates ca-certificates-java curl  software-properties-common python3-pip lsb-release
+- **Install Java**
+wget -qO- https://apt.corretto.aws/corretto.key | sudo gpg --dearmor  -o /usr/share/keyrings/corretto.gpg
+echo "deb [signed-by=/usr/share/keyrings/corretto.gpg] [https://apt.corretto.aws](https://apt.corretto.aws/) stable main" |  sudo tee -a /etc/apt/sources.list.d/corretto.sources.list
+sudo apt update
+sudo apt install java-common java-11-amazon-corretto-jdk
+echo JAVA_HOME="/usr/lib/jvm/java-11-amazon-corretto" | sudo tee -a /etc/environment
+export JAVA_HOME="/usr/lib/jvm/java-11-amazon-corretto"
+- **Install Cassandra**
+wget -qO -  https://downloads.apache.org/cassandra/KEYS | sudo gpg --dearmor  -o /usr/share/keyrings/cassandra-archive.gpg
+echo "deb [signed-by=/usr/share/keyrings/cassandra-archive.gpg] [https://debian.cassandra.apache.org](https://debian.cassandra.apache.org/) 40x main" |  sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+sudo apt update
+sudo apt install cassandra
+- **Install ElasticSearch**
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch |  sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+sudo apt-get install apt-transport-https
+echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main" |  sudo tee /etc/apt/sources.list.d/elastic-7.x.list
+sudo apt update
+sudo apt install elasticsearch
+
+
+Create a jvm.options file under /etc/elasticsearch/jvm.options.d and put the following configurations in that file.
+-Dlog4j2.formatMsgNoLookups=true
+-Xms2g
+-Xmx2g
+
+- **Install TheHive**
+wget -O- https://archives.strangebee.com/keys/strangebee.gpg | sudo gpg --dearmor -o /usr/share/keyrings/strangebee-archive-keyring.gpg
+echo 'deb [signed-by=/usr/share/keyrings/strangebee-archive-keyring.gpg] [https://deb.strangebee.com](https://deb.strangebee.com/) thehive-5.2 main' | sudo tee -a /etc/apt/sources.list.d/strangebee.list
+sudo apt-get update
+sudo apt-get install -y thehive
+- Default Credentials on port 9000
+credentials are 'admin@thehive.local' with a password of 'secret'
+
+## 3.1. Configure TheHive
+
+### Configure Cassandra
+
+nano /etc/cassandra/cassandra.yaml
+
+- Change cluster_name: (change to any name)
+- change listen_address: (THeHive IP address) 170.64.141.171
+- change rpc_address: (THeHive IP address) 170.64.141.171
+- change seeds (under seed_provider): (THeHive IP address) 170.64.141.171:7000
+- stop cassandra service: systemctl stop cassandra.service
+- remove all related files: rm -rf /var/lib/cassandra/*
+- start the service: systemctl start cassandra.service
+- check service status: systemctl status cassandra.service
+    - → It should be active (running) by now
+
+### Configure ElasticSearch → use to query data
+
+nano /etc/elasticsearch/elasticsearch.yml
+
+- Un-comment and Change cluster_name: TheHive
+- un-comment node.name
+- Un-comment & change network.host: (THeHive IP address) 170.64.141.171
+- Un-comment cluster.initial_master_nodes & remove node-2
+- start the service: systemctl start elasticsearch
+- enable the service: systemctl enable elasticsearch.service
+- check service status: systemctl status elasticsearch.service
+    - → It should be active (running) by now
+
+### Configure TheHive
+
+check if TheHive can have access to some certain files: 
+
+- ls -la /opt/thp → this is the file path that theHive requires access to → currently root has access to theHive directory
+    
+    ![Screenshot 2024-11-07 at 1.44.11 AM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/d2c13d7d-809b-4d44-aa00-d9c37e1c3614/c256b47c-86ca-40b2-9446-1e1102ad0a9c/Screenshot_2024-11-07_at_1.44.11_AM.png)
+    
+- chown -R thehive:thehive /opt/thp → change owner to theHive user and theHive group over to the destination directory
+    
+    ![Screenshot 2024-11-07 at 1.46.42 AM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/d2c13d7d-809b-4d44-aa00-d9c37e1c3614/4045fcbd-a95f-4bd9-8077-60de35c88ee3/Screenshot_2024-11-07_at_1.46.42_AM.png)
+    
+
+Configure theHive configuration file: nano /etc/thehive/application.conf
+
+- change hostname to IP address 170.64.141.171
+- change cluster_name: Brian
+- change application.baseUrl to 170.64.141.171
+
+→ By default: TheHive has 
+
+-Cortex: is their data enrichment and response capability
+
+-Mist: used for CTI platform (Cyber Threat Intelligence)
+
+- start the service: systemctl start thehive
+- enable the service: systemctl enable thehive
+- check service status: systemctl status thehive
+    - → It should be active (running) by now
+
+### Login to TheHive: http://170.64.141.171:9000
+
+- Credentials:
+admin@thehive.local
+secret
+- If credential fails to get access, check elasticsearch service → create jvm file
+Create a jvm.options file under /etc/elasticsearch/jvm.options.d and put the following configurations in that file.
+    - nano /etc/elasticsearch/jvm.options.d/jvm.options *
+    nano /etc/elasticsearch/jvm.options.d/jvm.options *
+    -Dlog4j2.formatMsgNoLookups=true
+    -Xms2g
+    -Xmx2g
