@@ -31,7 +31,7 @@ The first step in building a Security Operations Center (SOC) automation project
 <img width="1029" alt="step 1b" src="https://github.com/user-attachments/assets/f0ca39b3-6252-44a7-b88a-6b1ac9601dfc">
 (Figure 2)
 
-#### Core Diagram Components
+#### A. Core Diagram Components
 
 The emphasis should be on functionality rather than aesthetics. Each component represents a specific function within the SOC automation project:
 - **PC Icon**: Represents a Windows 10 client with the Wazuh agent installed to simulate data flow from an endpoint.
@@ -44,7 +44,7 @@ The emphasis should be on functionality rather than aesthetics. Each component r
 - **Shuffle**: SOAR platform for orchestration and response.
 - **SOC Analyst**: Person receiving and acting on alerts.
 
-#### Establishing Workflow Steps
+#### B. Establishing Workflow Steps
 
 - **Step 1**: Windows 11 client sends events to Wazuh Manager.
 - **Step 2**: Wazuh Manager collects events.
@@ -62,7 +62,7 @@ The emphasis should be on functionality rather than aesthetics. Each component r
 
 #### A. Virtual Machine (VM) Creation
 - Created a Windows 11 virtual machine on Mac M1 to simulate a Windows environment for security monitoring. Due to the lack of compatibility coming from the M1 chip with Windows 11 ISO files, CrystalFetch and UTM are used as a VM host (Figure 3).
-- installed Sysmon on Windows 11 virtual machine and ensured the service was active and running.
+- Installed Sysmon on Windows 11 virtual machine and ensured the service was active and running.
 <img width="899" alt="step 2" src="https://github.com/user-attachments/assets/c34ee817-54a1-4960-8099-2adaee7b5d6a">
 (Figure 3)
 
@@ -86,7 +86,7 @@ The emphasis should be on functionality rather than aesthetics. Each component r
 **Firewall Integration**: Added firewall rules to allow Wazuh connections.
 
 **Command Execution**: Accessed Wazuh via SSH, updated and upgraded the server, and installed the Wazuh package using:
-curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
+'curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh && sudo bash ./wazuh-install.sh -a'
   - After installation, store the login credentials for future use.
     
 **Login and Configuration**: Logged into the Wazuh dashboard to configure detection rules for various threats (Figure 6).
@@ -133,33 +133,33 @@ curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh && sudo bash ./wazuh-in
 
 
 **Download and Prepare Mimikatz**
-   - Download Mimikatz and adjust Windows Defender settings to exclude the Downloads folder (to prevent file interference).
-   - If needed, adjust Google Chrome’s security settings to enable the download.
-   - Extract Mimikatz for testing.
+   - Downloaded Mimikatz and adjust Windows Defender settings to exclude the Downloads folder (to prevent file interference).
+   - If needed, adjusted Google Chrome’s security settings to enable the download.
+   - Extracted Mimikatz for testing.
 
 **Run Mimikatz**
-   - Open an administrator PowerShell session, navigate to the Mimikatz directory, and execute `mimikatz.exe`.
+   - Opened an administrator PowerShell session, navigate to the Mimikatz directory, and execute `mimikatz.exe`.
 <img width="717" alt="step 4b" src="https://github.com/user-attachments/assets/c905b315-6d1e-4846-a9f0-2cdf5ee0cbd4">
 
 **Check for Mimikatz Events in Wazuh Dashboard**
-   - Search for Mimikatz-related events in the Wazuh dashboard.
+   - Searched for Mimikatz-related events in the Wazuh dashboard.
    - If no events appear, check that logging settings are properly configured, as Wazuh may only log events that trigger specific alerts by default.
 
 **Update Wazuh Configuration for Comprehensive Logging**
-    - Back up the `ossec.conf` file on the Wazuh manager.
-    - Open `ossec.conf` and set `log_all` and `log_all_json` to "yes" to enable logging for all events.
-    - Restart the Wazuh manager to apply these settings.
+    - Backed up the `ossec.conf` file on the Wazuh manager.
+    - Opened `ossec.conf` and set `log_all` and `log_all_json` to "yes" to enable logging for all events.
+    - Restarted the Wazuh manager to apply these settings.
 
 **Configure Filebeat**
-    - Update the Filebeat configuration to allow ingestion of archived logs.
-    - Restart the Filebeat service to implement changes.
+    - Updated the Filebeat configuration to allow ingestion of archived logs.
+    - Restarted the Filebeat service to implement changes.
 
 **Set Up a New Index in Wazuh**
-    - In the Wazuh dashboard, navigate to Stack Management, and create a new index pattern to monitor archived logs.
+    - In the Wazuh dashboard, navigated to Stack Management, and create a new index pattern to monitor archived logs.
 
 **Verify Log Ingestion**
-    - Allow some time for log ingestion, then check the dashboard for Mimikatz events.
-    - If events are not visible, troubleshoot by checking archive files directly.
+    - Allowed some time for log ingestion, then check the dashboard for Mimikatz events.
+    - If events were not visible, troubleshooted by checking archive files directly.
 
 **Create a Custom Alert Rule in Wazuh**
     - Use Wazuh’s built-in rules for reference.
@@ -167,7 +167,7 @@ curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh && sudo bash ./wazuh-in
     - Pay attention to proper syntax and case sensitivity when creating the rule.
 
 **Test the Custom Alert**
-    - Rename `mimikatz.exe` to an alternative name (e.g., "brianistryinghisbest.exe").
+    - Renamed `mimikatz.exe` to an alternative name (e.g., "brianistryinghisbest.exe").
     - Run the renamed file, then check the Wazuh dashboard for any triggered alerts.
 <img width="1633" alt="step 4c" src="https://github.com/user-attachments/assets/82288541-40c3-44a7-a44e-359ca1569b68">
 
